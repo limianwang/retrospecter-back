@@ -5,6 +5,8 @@ var http = require('http');
 var bodyParser = require('body-parser');
 var express = require('express');
 
+var models = require('./models');
+
 var app = express();
 var server = http.createServer(app);
 var io = require('socket.io')(server, { serveClient: false });
