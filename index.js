@@ -1,34 +1,57 @@
 'use strict';
 
+var debug = require('debug')('retrospecter');
 var http = require('http');
+var bodyParser = require('body-parser');
 var express = require('express');
 
 var app = express();
 var server = http.createServer(app);
 var io = require('socket.io')(server, { serveClient: false });
 
-app.get('/', function(req, res) {
-  res.status(200).send({a: 'b'});
-});
+app.use(bodyParser.json());
 
-// Create a new board
 app.post('/boards', function(req, res) {
+  var boardId = randBoardId();
+  debug('creating boardId:' + boardId);
 
+  res.status(200).send(boardId);
 });
 
-// Get/Connect a new board
-app.get('/boards/:boardId', function(req, res) {
+app.post('/boards/:boardId/messages', function(req, res) {
+  debug('attempting to message to boardId: ' + req.params.boardId);
+  var message = req.body;
+
+  io.sockets.in(req.params.boardId).emit('message', {
+    boardId: req.params.boardId,
+    message: message
+  });
+
+  res.status(200).send();
 });
 
 server.listen(8080, function() {
   console.log('server started ...');
 });
 
-io.on('connection', function(socket) {
-  console.log('someone connected..');
+io.sockets.on('connection', function(socket) {
+  debug('someone connected...');
+  socket.on('subscribe', function(boardId) {
+    debug('joining boardId' + boardId);
+    socket.join(boardId);
+  });
 
-  socket.emit('event', 'welcome to the club...');
-  socket.on('some response message', function() {
-    console.log([].slice.call(arguments));
+  socket.on('unsubscribe', function(boardId) {
+    debug('leaving boardId' + boardId);
+    socket.leave(boardId);
+  });
+
+  socket.on('send', function(data) {
+    debug('sending message');
+    io.sockets.in(data.boardId).emit('message', data);
   });
 });
+
+function randBoardId() {
+  return Math.floor(Math.random(0, 9000)) + 1000;
+}
