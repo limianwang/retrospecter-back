@@ -4,19 +4,31 @@ var http = require('http');
 var express = require('express');
 
 var app = express();
+var server = http.createServer(app);
+var io = require('socket.io')(server, { serveClient: false });
+
 app.get('/', function(req, res) {
-  console.log('root');
   res.status(200).send({a: 'b'});
 });
 
-var server = http.createServer(app);
+// Create a new board
+app.post('/boards', function(req, res) {
+
+});
+
+// Get/Connect a new board
+app.get('/boards/:boardId', function(req, res) {
+});
 
 server.listen(8080, function() {
   console.log('server started ...');
 });
 
-var io = require('socket.io')(server);
-
 io.on('connection', function(socket) {
-  console.log('some user connected..');
+  console.log('someone connected..');
+
+  socket.emit('event', 'welcome to the club...');
+  socket.on('some response message', function() {
+    console.log([].slice.call(arguments));
+  });
 });
