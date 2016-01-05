@@ -64,7 +64,7 @@ app.post('/teams/:teamId/boards', function(req, res) {
   });
 });
 
-app.post('/teams/:teams/boards/:boardId/messages', function(req, res) {
+app.post('/teams/:teamId/boards/:boardId/messages', function(req, res) {
   debug('attempting to message to boardId: ' + req.params.boardId);
   var message = req.body;
 
