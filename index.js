@@ -13,6 +13,25 @@ var io = require('socket.io')(server, { serveClient: false });
 
 app.use(bodyParser.json());
 
+app.use(function(err, req, res, next) {
+  res.status(500).send({
+    message: err.message || err,
+    stack: err.stack || err
+  });
+});
+
+app.get('/boards/:boardId', function(req, res) {
+  return models.Board.findOne({
+    _id: req.params.boardId
+  }, function(err, board) {
+    if (err) {
+      return next(err);
+    }
+
+    res.status(200).send(board);
+  });
+});
+
 app.post('/boards', function(req, res) {
   var boardId = randBoardId();
   debug('creating boardId:' + boardId);
