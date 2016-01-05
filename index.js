@@ -1,11 +1,13 @@
 'use strict';
 
 var debug = require('debug')('retrospecter');
+
+var util = require('util');
 var http = require('http');
 var bodyParser = require('body-parser');
 var express = require('express');
 
-var models = require('./models');
+var Board = require('./models').Board;
 
 var app = express();
 var server = http.createServer(app);
@@ -22,10 +24,7 @@ app.use(function(err, req, res, next) {
 
 app.get('/teams/:teamId/boards/:boardId', function(req, res) {
   debug('getting team board', req.params.teamId, req.params.boardId);
-});
-
-app.get('/teams/:teamId/boards/:boardId', function(req, res) {
-  return models.Board.findOne({
+  return Board.findOne({
     _id: req.params.boardId,
     teamId: req.params.teamId
   }, function(err, board) {
@@ -38,7 +37,7 @@ app.get('/teams/:teamId/boards/:boardId', function(req, res) {
 });
 
 app.get('/teams/:teamId/boards', function(req, res) {
-  Board.find({
+  return Board.find({
     teamId: req.params.teamId
   }, function(err, boards) {
     if (err) {
@@ -77,7 +76,7 @@ app.post('/teams/:teamId/boards/:boardId/messages', function(req, res) {
 });
 
 server.listen(8080, function() {
-  console.log('server started ...');
+  debug('server started...');
 });
 
 io.sockets.on('connection', function(socket) {

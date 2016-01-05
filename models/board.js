@@ -10,6 +10,11 @@ var boardSchema = new mongoose.Schema({
   teamId: {
     type: String,
     lowercase: true
+  },
+  votes: {
+    type: Number,
+    default: 0,
+    min: 0
   }
 });
 
