@@ -10,5 +10,6 @@ var connstr = util.format('mongodb://%s:%s/%s', config.db.host, config.db.port, 
 mongoose.connect(connstr);
 
 module.exports = {
-  Board: require('./board')
+  Board: require('./board'),
+  Team: require('./team')
 };

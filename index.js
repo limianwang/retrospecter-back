@@ -6,6 +6,7 @@ var util = require('util');
 var http = require('http');
 var bodyParser = require('body-parser');
 var express = require('express');
+var cors = require('cors');
 
 var Board = require('./models').Board;
 
@@ -15,6 +16,7 @@ var io = require('socket.io')(server, { serveClient: false });
 
 app.use(bodyParser.json());
 
+app.use(cors());
 app.use(function(err, req, res, next) {
   res.status(500).send({
     message: err.message || err,
@@ -22,17 +24,18 @@ app.use(function(err, req, res, next) {
   });
 });
 
-app.get('/teams/:teamId/boards/:boardId', function(req, res) {
-  debug('getting team board', req.params.teamId, req.params.boardId);
-  return Board.findOne({
-    _id: req.params.boardId,
-    teamId: req.params.teamId
-  }, function(err, board) {
+/**
+ * Team
+ */
+app.post('/teams', function(req, res, next) {
+  var team = new Team(req.body);
+
+  return team.save(function(err) {
     if (err) {
       return next(err);
     }
 
-    res.status(200).send(board);
+    res.status(200).send(team);
   });
 });
 
@@ -49,17 +52,30 @@ app.get('/teams/:teamId/boards', function(req, res) {
 });
 
 app.post('/teams/:teamId/boards', function(req, res) {
-  var boardId = randBoardId();
   debug(util.format('creating board for teamId: %s', req.params.teamId));
 
   var board = new Board(req.body);
 
-  board.save(function(err) {
+  return board.save(function(err) {
     if(err) {
       return next(err);
     }
 
-    res.status(200).send(boardId);
+    res.status(200).send(board);
+  });
+});
+
+app.get('/teams/:teamId/boards/:boardId', function(req, res) {
+  debug('getting team board', req.params.teamId, req.params.boardId);
+  return Board.findOne({
+    _id: req.params.boardId,
+    teamId: req.params.teamId
+  }, function(err, board) {
+    if (err) {
+      return next(err);
+    }
+
+    res.status(200).send(board);
   });
 });
 
