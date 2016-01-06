@@ -9,6 +9,7 @@ var express = require('express');
 var cors = require('cors');
 
 var Board = require('./models').Board;
+var Team = require('./models').Team;
 
 var app = express();
 var server = http.createServer(app);
@@ -27,6 +28,17 @@ app.use(function(err, req, res, next) {
 /**
  * Team
  */
+
+app.get('/teams', function(req, res, next) {
+  return Team.find({}, function(err, teams) {
+    if (err) {
+      return next(err);
+    }
+
+    res.status(200).send(teams);
+  });
+});
+
 app.post('/teams', function(req, res, next) {
   var team = new Team(req.body);
 
