@@ -9,6 +9,7 @@ var express = require('express');
 var cors = require('cors');
 
 var Board = require('./models').Board;
+var Action = require('./models').Action;
 var Team = require('./models').Team;
 
 var app = express();
@@ -91,16 +92,49 @@ app.get('/teams/:teamId/boards/:boardId', function(req, res) {
   });
 });
 
-app.post('/teams/:teamId/boards/:boardId/messages', function(req, res) {
-  debug('attempting to message to boardId: ' + req.params.boardId);
-  var message = req.body;
+app.get('/teams/:teamId/boards/:boardId/items', function(req, res, next) {
+  debug('attempting to get items for boardId:' + req.params.boardId);
 
-  io.sockets.in(req.params.boardId).emit('message', {
-    boardId: req.params.boardId,
-    message: message
+  return items.find({
+    teamId: req.params.teamId,
+    boardId: req.params.boardId
+  }, function(err, items) {
+    if (err) {
+      return next(err);
+    }
+
+    res.status(200).send(items);
+  });
+});
+
+app.post('/teams/:teamId/boards/:boardId/items', function(req, res) {
+  debug('attempting to create action to boardId: ' + req.params.boardId);
+  var item = new items(req.body);
+
+  return item.save(function(err) {
+    io.sockets.in(req.params.boardId).emit('message:item', {
+      boardId: req.params.boardId,
+      message: item
+    });
+
+    res.status(200).send(item);
   });
 
-  res.status(200).send();
+});
+
+app.get('/teams/:teamId/boards/:boardId/actions', function(req, res, next) {
+  debug('attemping to get actions');
+
+  return actions.find({
+    teamId: req.params.teamId,
+    boardId: req.params.boardId
+  }, function(err, actions) {
+    if (err) {
+      return next(err);
+    }
+
+    res.status(200).send(actions);
+  });
 });
 
 server.listen(8080, function() {
@@ -117,11 +151,6 @@ io.sockets.on('connection', function(socket) {
   socket.on('unsubscribe', function(boardId) {
     debug('leaving boardId' + boardId);
     socket.leave(boardId);
-  });
-
-  socket.on('send', function(data) {
-    debug('sending message');
-    io.sockets.in(data.boardId).emit('message', data);
   });
 });
 

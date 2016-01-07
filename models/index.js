@@ -11,5 +11,7 @@ mongoose.connect(connstr);
 
 module.exports = {
   Board: require('./board'),
-  Team: require('./team')
+  Team: require('./team'),
+  Action: require('./action'),
+  Item: require('./item')
 };

@@ -7,14 +7,13 @@ var boardSchema = new mongoose.Schema({
     type: String,
     lowercase: true
   },
-  teamId: {
+  period: {
     type: String,
     lowercase: true
   },
-  votes: {
-    type: Number,
-    default: 0,
-    min: 0
+  teamId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
   }
 });
 
