@@ -52,7 +52,7 @@ app.post('/teams', function(req, res, next) {
   });
 });
 
-app.get('/teams/:teamId/boards', function(req, res) {
+app.get('/teams/:teamId/boards', function(req, res, next) {
   return Board.find({
     teamId: req.params.teamId
   }, function(err, boards) {
@@ -64,7 +64,7 @@ app.get('/teams/:teamId/boards', function(req, res) {
   });
 });
 
-app.post('/teams/:teamId/boards', function(req, res) {
+app.post('/teams/:teamId/boards', function(req, res, next) {
   debug(util.format('creating board for teamId: %s', req.params.teamId));
 
   var board = new Board(req.body);
@@ -78,7 +78,7 @@ app.post('/teams/:teamId/boards', function(req, res) {
   });
 });
 
-app.get('/teams/:teamId/boards/:boardId', function(req, res) {
+app.get('/teams/:teamId/boards/:boardId', function(req, res, next) {
   debug('getting team board', req.params.teamId, req.params.boardId);
   return Board.findOne({
     _id: req.params.boardId,
@@ -107,11 +107,15 @@ app.get('/teams/:teamId/boards/:boardId/items', function(req, res, next) {
   });
 });
 
-app.post('/teams/:teamId/boards/:boardId/items', function(req, res) {
+app.post('/teams/:teamId/boards/:boardId/items', function(req, res next) {
   debug('attempting to create action to boardId: ' + req.params.boardId);
   var item = new items(req.body);
 
   return item.save(function(err) {
+    if (err) {
+      return next(err);
+    }
+
     io.sockets.in(req.params.boardId).emit('message:item', {
       boardId: req.params.boardId,
       message: item
