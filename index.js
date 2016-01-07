@@ -107,7 +107,7 @@ app.get('/teams/:teamId/boards/:boardId/items', function(req, res, next) {
   });
 });
 
-app.post('/teams/:teamId/boards/:boardId/items', function(req, res next) {
+app.post('/teams/:teamId/boards/:boardId/items', function(req, res, next) {
   debug('attempting to create action to boardId: ' + req.params.boardId);
   var item = new items(req.body);
 
