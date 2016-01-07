@@ -118,12 +118,33 @@ app.post('/teams/:teamId/boards/:boardId/items', function(req, res, next) {
 
     io.sockets.in(req.params.boardId).emit('message:item', {
       boardId: req.params.boardId,
+      teamId: req.params.teamId,
       message: item
     });
 
     res.status(200).send(item);
   });
 
+});
+
+app.post('/teams/:teamId/boards/:boardId/actions', function(req, res, next) {
+  debug('attempting to create a new action');
+
+  var action = new actions(req.body);
+
+  return action.save(function(err) {
+    if (err) {
+      return next(err);
+    }
+
+    io.sockets.in(req.params.boardId).emit('message:action', {
+      boardId: req.params.boardId,
+      teamId: req.params.teamId,
+      message: action
+    });
+
+    res.status(200).send(action);
+  });
 });
 
 app.get('/teams/:teamId/boards/:boardId/actions', function(req, res, next) {
