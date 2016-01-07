@@ -15,6 +15,11 @@ var itemSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: true
   },
+  category: {
+    type: String,
+    enum: ['GOOD','BAD','IDEA','ACHIEVMENT'],
+    default: 'GOOD'
+  },
   votes: {
     type: Number,
     default: 0
