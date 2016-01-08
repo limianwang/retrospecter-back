@@ -17,7 +17,7 @@ var actionSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['TODO','IN PROGRESS','DONE'],
+    enum: ['TODO','IN PROGRESS','DONE','WAITING'],
     default: 'TODO'
   },
   endDate: {

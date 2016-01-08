@@ -11,6 +11,7 @@ var cors = require('cors');
 var Board = require('./models').Board;
 var Action = require('./models').Action;
 var Team = require('./models').Team;
+var Item = require('./models').Item;
 
 var app = express();
 var server = http.createServer(app);
@@ -95,7 +96,7 @@ app.get('/teams/:teamId/boards/:boardId', function(req, res, next) {
 app.get('/teams/:teamId/boards/:boardId/items', function(req, res, next) {
   debug('attempting to get items for boardId:' + req.params.boardId);
 
-  return items.find({
+  return Item.find({
     teamId: req.params.teamId,
     boardId: req.params.boardId
   }, function(err, items) {
@@ -109,7 +110,7 @@ app.get('/teams/:teamId/boards/:boardId/items', function(req, res, next) {
 
 app.post('/teams/:teamId/boards/:boardId/items', function(req, res, next) {
   debug('attempting to create action to boardId: ' + req.params.boardId);
-  var item = new items(req.body);
+  var item = new Item(req.body);
 
   return item.save(function(err) {
     if (err) {
@@ -124,13 +125,32 @@ app.post('/teams/:teamId/boards/:boardId/items', function(req, res, next) {
 
     res.status(200).send(item);
   });
+});
 
+app.post('/teams/:teamId/boards/:boardId/items/:itemId/votes', function(req, res, next) {
+  debug('increment vote' + req.params.itemId);
+
+  return Item.findOneAndUpdate({
+    teamId: req.params.teamId,
+    boardId: req.params.boardId,
+    _id: req.params.itemId
+  }, {
+    '$inc': {
+      votes: 1
+    }
+  }, function(err, item) {
+    if (err) {
+      return next(err);
+    }
+
+    res.status(200).send(item);
+  });
 });
 
 app.post('/teams/:teamId/boards/:boardId/actions', function(req, res, next) {
   debug('attempting to create a new action');
 
-  var action = new actions(req.body);
+  var action = new Action(req.body);
 
   return action.save(function(err) {
     if (err) {
@@ -150,7 +170,7 @@ app.post('/teams/:teamId/boards/:boardId/actions', function(req, res, next) {
 app.get('/teams/:teamId/boards/:boardId/actions', function(req, res, next) {
   debug('attemping to get actions');
 
-  return actions.find({
+  return Action.find({
     teamId: req.params.teamId,
     boardId: req.params.boardId
   }, function(err, actions) {
