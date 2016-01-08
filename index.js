@@ -81,6 +81,20 @@ app.post('/teams/:teamId/boards', function(req, res, next) {
   });
 });
 
+app.get('/teams/:teamId/actions', function(req, res, next) {
+  debug('getting actions for TeamID:' + req.params.teamId);
+
+  return Action.find({
+    teamId: req.params.teamId
+  }, function(err, actions) {
+    if (err) {
+      return next(err);
+    }
+
+    res.status(200).send(actions);
+  });
+});
+
 app.get('/teams/:teamId/boards/:boardId', function(req, res, next) {
   debug('getting team board', req.params.teamId, req.params.boardId);
   return Board.findOne({
