@@ -67,8 +67,10 @@ app.get('/teams/:teamId/boards', function(req, res, next) {
 
 app.post('/teams/:teamId/boards', function(req, res, next) {
   debug(util.format('creating board for teamId: %s', req.params.teamId));
+  var body = req.body;
+  body.teamId = req.params.teamId;
 
-  var board = new Board(req.body);
+  var board = new Board(body);
 
   return board.save(function(err) {
     if(err) {
@@ -110,7 +112,12 @@ app.get('/teams/:teamId/boards/:boardId/items', function(req, res, next) {
 
 app.post('/teams/:teamId/boards/:boardId/items', function(req, res, next) {
   debug('attempting to create action to boardId: ' + req.params.boardId);
-  var item = new Item(req.body);
+  var body = req.body;
+
+  body.teamId = req.params.teamId;
+  body.boardId = req.params.boardId;
+
+  var item = new Item(body);
 
   return item.save(function(err) {
     if (err) {
