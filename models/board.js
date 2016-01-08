@@ -5,7 +5,8 @@ var mongoose = require('mongoose');
 var boardSchema = new mongoose.Schema({
   name: {
     type: String,
-    lowercase: true
+    lowercase: true,
+    required: true
   },
   period: {
     type: String,
