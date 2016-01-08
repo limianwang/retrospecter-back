@@ -17,7 +17,7 @@ var itemSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['GOOD','BAD','IDEA','ACHIEVMENT'],
+    enum: ['GOOD','BAD','IDEA','ACHIEVEMENT'],
     default: 'GOOD'
   },
   votes: {
