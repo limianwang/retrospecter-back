@@ -158,7 +158,8 @@ app.post('/teams/:teamId/boards/:boardId/actions', function(req, res, next) {
   debug('attempting to create a new action');
 
   var action = new Action(req.body);
-
+  action.teamId = req.params.teamId;
+  action.boardId = req.params.boardId;
   return action.save(function(err) {
     if (err) {
       return next(err);
